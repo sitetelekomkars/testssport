@@ -5646,8 +5646,9 @@ async function logEvaluationPopup() {
             }
 
             const callDateRaw = document.getElementById('eval-calldate').value;
-            const dateParts = callDateRaw.split('-');
-            const formattedCallDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : callDateRaw;
+            // DÜZELTME: Backend TIMESTAMP bekliyor. DD.MM.YYYY'ye ÇEVİRME!
+            // Input'tan gelen YYYY-MM-DD formatını direkt kullan ve saat ekle.
+            const formattedCallDate = callDateRaw ? `${callDateRaw}T00:00:00` : new Date().toISOString();
 
             if (isCriteriaBased) {
                 let total = 0; let detailsArr = [];
