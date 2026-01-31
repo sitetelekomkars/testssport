@@ -1349,8 +1349,15 @@ async function girisYap() {
         return;
     }
 
+
+    // YENİ: Otomatik domain tamamlama (@ yoksa ekle)
+    let finalEmail = emailInput;
+    if (!finalEmail.includes('@')) {
+        finalEmail += "@ssportplus.com";
+    }
+
     // Email formatı kontrolü (Basit)
-    if (!emailInput.includes('@')) {
+    if (!finalEmail.includes('@')) {
         errorMsg.innerText = "Lütfen geçerli bir e-posta adresi giriniz.";
         errorMsg.style.display = "block";
         return;
@@ -1363,7 +1370,7 @@ async function girisYap() {
 
     try {
         const { data, error } = await sb.auth.signInWithPassword({
-            email: emailInput,
+            email: finalEmail,
             password: passwordInput,
         });
 
@@ -1384,7 +1391,7 @@ async function girisYap() {
             apiCall("logAction", {
                 action: "Giriş",
                 details: "Supabase Auth Login",
-                username: emailInput
+                username: finalEmail
             });
         } catch (e) { console.warn("Log hatası:", e); }
 
