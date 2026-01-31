@@ -1333,6 +1333,17 @@ async function checkSession() {
                 Swal.fire('Oturum Kapandı', 'Yönetici tarafından çıkışınız sağlandı.', 'warning');
                 return;
             }
+
+            // ✅ ZORUNLU ŞİFRE DEĞİŞİKLİĞİ (Güvenlik Önlemi)
+            if (profile.must_change_password) {
+                // UI Güncellemelerini beklemeden direkt popup açalım
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("app-preloader").style.display = "none";
+
+                // Modal
+                changePasswordPopup(true); // true = mandatory
+                return; // Akışı durdur, şifre değişmeden içeri almasın
+            }
         }
     } catch (e) {
         console.warn("Profil çekilemedi, metadata kullanılıyor.", e);
@@ -1596,13 +1607,17 @@ function openUserMenu() { toggleUserDropdown(); }
 
 async function changePasswordPopup(isMandatory = false) {
     const { value: newPass } = await Swal.fire({
-        title: 'Şifre Değiştir',
+        title: isMandatory ? '⚠️ Güvenlik Uyarısı' : 'Şifre Değiştir',
+        text: isMandatory ? 'Yönetici tarafından şifrenizi değiştirmeniz istendi. Lütfen yeni bir şifre belirleyiniz.' : '',
         input: 'password',
         inputLabel: 'Yeni Şifreniz',
         inputPlaceholder: 'En az 6 karakter',
-        showCancelButton: true,
+        showCancelButton: !isMandatory, // Zorunluysa iptal butonu yok
         confirmButtonText: 'Güncelle',
         cancelButtonText: 'İptal',
+        allowOutsideClick: !isMandatory, // Zorunluysa dışarı tıklanmaz
+        allowEscapeKey: !isMandatory,    // Zorunluysa ESC çalışmaz
+        icon: isMandatory ? 'warning' : 'info',
         inputValidator: (value) => {
             if (!value || value.length < 6) return 'Şifre en az 6 karakter olmalıdır!';
         }
@@ -1614,10 +1629,32 @@ async function changePasswordPopup(isMandatory = false) {
             const { error } = await sb.auth.updateUser({ password: newPass });
             if (error) throw error;
 
-            Swal.fire('Başarılı', 'Şifreniz güncellendi.', 'success');
+            // ✅ Şifre değişti, zorunluluk bayrağını kaldır
+            if (isMandatory) {
+                await sb.from('profiles').update({ must_change_password: false }).eq('id', currentUserId);
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Başarılı',
+                text: 'Şifreniz güncellendi. Lütfen yeni şifrenizle giriş yapın.',
+                confirmButtonText: 'Tamam'
+            }).then(() => {
+                // Güvenlik için yeniden giriş yaptırabiliriz veya direkt devam ettirebiliriz.
+                // Best practice: Yeniden giriş.
+                if (isMandatory) {
+                    logout();
+                }
+            });
+
         } catch (e) {
             Swal.fire('Hata', 'Şifre güncellenemedi: ' + e.message, 'error');
+            // Hata aldıysa ve zorunluysa tekrar aç
+            if (isMandatory) setTimeout(() => changePasswordPopup(true), 2000);
         }
+    } else if (isMandatory) {
+        // İptal edemez, tekrar aç
+        changePasswordPopup(true);
     }
 }
 // --- DATA FETCHING (Supabase Optimized) ---
