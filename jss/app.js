@@ -5289,9 +5289,12 @@ function updateAgentListBasedOnGroup() {
     const selectedGroup = groupSelect.value;
     agentSelect.innerHTML = '';
 
-    let filteredUsers = adminUserList;
+    // STRICT: Sadece role='user' olanları al (Yönetici/LocAdmin gizle)
+    let baseList = adminUserList.filter(u => String(u.role).toLowerCase() === 'user');
+    let filteredUsers = baseList;
+
     if (selectedGroup !== 'all') {
-        filteredUsers = adminUserList.filter(u => u.group === selectedGroup);
+        filteredUsers = baseList.filter(u => u.group === selectedGroup);
         agentSelect.innerHTML = `<option value="all">-- Tüm ${selectedGroup} Ekibi --</option>`;
     } else {
         agentSelect.innerHTML = `<option value="all">-- Tüm Temsilciler --</option>`;
