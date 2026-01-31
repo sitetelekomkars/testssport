@@ -15,7 +15,16 @@
 </head>
 
 <body>
-  <div id="login-screen">
+  <!-- Preloader -->
+  <div id="app-preloader"
+    style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1d1d1d;z-index:9999;display:flex;justify-content:center;align-items:center;">
+    <div style="text-align:center;">
+      <i class="fas fa-circle-notch fa-spin" style="font-size:3rem;color:#00e5ff;"></i>
+      <div style="margin-top:15px;color:#fff;font-family:sans-serif;">Pusula Yükleniyor...</div>
+    </div>
+  </div>
+
+  <div id="login-screen" style="display:none !important;">
     <div class="login-card"><img src="favicon.png" alt="Logo" class="login-logo-img">
       <h2 class="login-title">
         <span class="brand-main">S Sport Plus</span>
@@ -34,13 +43,13 @@
         Şifre!</p>
     </div>
   </div>
-  <div id="maintenance-screen">
+  <div id="maintenance-screen" style="display:none;">
     <div class="maintenance-content" style="text-align:center;color:#fff"><span style="font-size:4rem">👨 ‍ 🏫</span>
       <h1>Sistem Mola Verdi!</h1>
       <p>Bakım çalışması sürüyor... 🚀</p>
     </div>
   </div>
-  <div id="main-app">
+  <div id="main-app" style="display:none !important;">
     <div class="header">
       <div class="header-content-limit">
         <div class="header-top">
