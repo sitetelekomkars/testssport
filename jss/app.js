@@ -1305,7 +1305,16 @@ async function checkSession() {
 
     // Oturum geçerli
     const user = session.user;
-    currentUser = user.user_metadata.username || user.email; // Metadata'dan al
+
+    // Kullanıcı adını belirle (Metadata yoksa mailin @ öncesini al)
+    // Bu, legacy sistemin 'kullanıcı adı' bekleyen yapısı için kritiktir.
+    let extractedName = user.user_metadata.username;
+    if (!extractedName && user.email) {
+        extractedName = user.email.split('@')[0];
+    }
+    currentUser = extractedName || user.email;
+
+    // Rol kontrolü (Metadata öncelikli)
     activeRole = user.user_metadata.role || 'user';
 
     // UI Güncelle
