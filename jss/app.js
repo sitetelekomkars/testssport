@@ -5791,7 +5791,9 @@ async function editEvaluation(targetCallId) {
             const callId = document.getElementById('eval-callid').value;
             const rawDate = document.getElementById('eval-calldate').value;
             let callDate = rawDate;
-            if (rawDate.includes('-')) { const p = rawDate.split('-'); if (p.length === 3) callDate = `${p[2]}.${p[1]}.${p[0]}`; }
+            // DÜZELTME: Backend YYYY-MM-DD bekliyor (tekrar DD.MM.YYYY yapma!)
+            // Eğer html input[type=date] ise zaten YYYY-MM-DD gelir.
+            // Sadece emin olmak için kontrol edebiliriz ama dönüştürme yapmayalım.
             const feedback = document.getElementById('eval-feedback').value;
             if (isCriteriaBased) {
                 let total = 0; let detailsArr = [];
