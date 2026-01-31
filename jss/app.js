@@ -1294,6 +1294,7 @@ async function checkSession() {
     if (!session || error) {
         console.log("[Pusula] Oturum bulunamadı, giriş ekranına yönlendiriliyor.");
         logout();
+        try { document.getElementById("app-preloader").style.display = "none"; } catch (e) { }
         return;
     }
 
@@ -1351,6 +1352,7 @@ async function checkSession() {
     if (BAKIM_MODU) {
         document.getElementById("maintenance-screen").style.display = "flex";
     } else {
+        document.getElementById("main-app").style.removeProperty("display");
         document.getElementById("main-app").style.display = "block";
         loadPermissionsOnStartup().then(() => {
             loadHomeBlocks();
@@ -1359,6 +1361,8 @@ async function checkSession() {
             loadTechWizardData();
         });
     }
+    // Preloader Gizle
+    try { document.getElementById("app-preloader").style.display = "none"; } catch (e) { }
 }
 function enterBas(e) { if (e.key === "Enter") girisYap(); }
 async function girisYap() {
@@ -1438,8 +1442,10 @@ async function logout() {
     localStorage.removeItem("sSportRole");
     localStorage.removeItem("sSportGroup");
 
+    document.getElementById("login-screen").style.removeProperty("display");
     document.getElementById("login-screen").style.display = "flex";
     document.getElementById("main-app").style.display = "none";
+    try { document.getElementById("app-preloader").style.display = "none"; } catch (e) { }
     console.log("[Pusula] Çıkış yapıldı.");
 }
 
