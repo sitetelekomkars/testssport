@@ -149,7 +149,7 @@ function normalizeKeys(obj) {
         if (k === 'Score' || k === 'Puan' || k === 'Points') { n.score = obj[k]; n.points = obj[k]; }
         if (k === 'Orta Puan' || k === 'MediumScore') n.mediumScore = obj[k];
         if (k === 'Kötü Puan' || k === 'BadScore') n.badScore = obj[k];
-        if (k === 'Okundu') n.isSeen = (String(obj[k]) === '1' || String(obj[k]).toLowerCase() === 'true');
+        if (k === 'Okundu') n.isSeen = (obj[k] === true || String(obj[k]) === 'true' || String(obj[k]) === '1');
         if (k === 'Durum' || k === 'Status') n.status = obj[k];
         if (k === 'FeedbackType') n.feedbackType = obj[k];
 
@@ -534,7 +534,7 @@ async function apiCall(action, params = {}) {
                 return { result: "success" };
             }
             case "markEvaluationSeen": {
-                const { error } = await sb.from('Evaluations').update({ Okundu: 1 }).eq('CallID', params.callId);
+                const { error } = await sb.from('Evaluations').update({ Okundu: true }).eq('CallID', params.callId);
                 if (error) throw error;
                 saveLog("Değerlendirme Okundu İşaretleme", `CallID: ${params.callId}`);
                 return { result: "success" };
@@ -5304,7 +5304,7 @@ function fetchUserListForAdmin() {
                     if (!u.group) return false;
                     const r = String(u.role || '').toLowerCase().trim();
                     const g = String(u.group).toLowerCase().trim();
-                    const isStaff = (r === 'user' || r === 'qusers');
+                    const isStaff = (r === 'user');
                     const isAllowedGroup = allowedWords.some(w => g.includes(w));
                     return isStaff && isAllowedGroup;
                 });
