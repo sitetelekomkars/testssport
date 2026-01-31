@@ -329,10 +329,16 @@ async function apiCall(action, params = {}) {
                 saveLog("Değerlendirme Kaydı", `${params.agentName} | ${params.callId} | ${params.score}`);
 
                 // ✅ MAİL BİLDİRİMİ TETİKLE
+                // ✅ MAİL BİLDİRİMİ TETİKLE (Profiles Tablosundan)
                 (async () => {
                     try {
-                        const { data: userData } = await sb.from('Users').select('Email').ilike('Username', params.agentName).maybeSingle();
-                        if (userData && userData.Email) {
+                        // Users yerine profiles tablosuna bakıyoruz
+                        const { data: userData } = await sb.from('profiles')
+                            .select('email')
+                            .ilike('username', params.agentName)
+                            .maybeSingle();
+
+                        if (userData && userData.email) {
                             const subject = `Yeni Kalite Değerlendirmesi: ${params.callId}`;
                             const body = `Merhaba ${params.agentName},\n\nYeni bir kalite değerlendirmesi kaydedildi.\n\nÇağrı ID: ${params.callId}\nPuan: ${params.score}\nGeri Bildirim: ${params.feedback}\n\nDetayları Pusula üzerinden inceleyebilirsin.\nİyi çalışmalar.\nS Sport Plus Kalite Ekibi`;
 
@@ -340,9 +346,14 @@ async function apiCall(action, params = {}) {
                             const cc = "kalite@ssportplus.com";
                             const bcc = "dogus.yalcinkaya@sitetelekom.com.tr";
 
-                            sendMailNotification(userData.Email, subject, body, cc, bcc);
+                            // Fonksiyon tanımlıysa gönder, değilse konsola yaz
+                            if (typeof sendMailNotification === 'function') {
+                                sendMailNotification(userData.email, subject, body, cc, bcc);
+                            } else {
+                                console.warn("sendMailNotification fonksiyonu bulunamadı, mail atılamadı.");
+                            }
                         }
-                    } catch (e) { }
+                    } catch (e) { console.error("Mail gönderme hatası:", e); }
                 })();
 
                 return { result: "success" };
